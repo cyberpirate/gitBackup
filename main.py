@@ -27,6 +27,15 @@ def createBranch(name=""):
 
     check_output([GIT_PATH, "branch", name])
 
+def branchExists(name=""):
+    name = LOCAL_BRANCH if not name else name
+
+    output = check_output([GIT_PATH, "branch"]).decode("utf-8").strip()
+    output = [ a.strip() for a in output.split("\n") if not a.startswith("*") ]
+    output.append(getBranch())
+
+    return name in output
+
 def switchBranch(name=""):
     name = LOCAL_BRANCH if not name else name
 
@@ -142,6 +151,12 @@ if len(sys.argv) <= 1 or len(sys.argv[1]) == 0:
 enterRepo()
 
 gitFetch()
+
+if not branchExists():
+    createBranch()
+
+if getBranch() != LOCAL_BRANCH:
+    switchBranch()
 
 if filesToCommit():
     commitAll()
